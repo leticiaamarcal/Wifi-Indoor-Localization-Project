@@ -451,14 +451,14 @@ postResample(testing6$LATITUDE, LR_latitude_b0_predic6)
 #Novo dataset com os waps que tem no validation. Vou treinar o dataset todo
 
 #separar o dado em train e test
-inTrain7 <- createDataPartition(y = wifi_data9$LATITUDE, p = .75, list = FALSE) 
+inTrain7 <- createDataPartition(y = wifi_data11$LATITUDE, p = .75, list = FALSE) 
 
 #criar o train e o set
-training7 <- wifi_data9[ inTrain7,]
-testing7 <- wifi_data9[-inTrain7,]
+training7 <- wifi_data11[ inTrain7,]
+testing7 <- wifi_data11[-inTrain7,]
 
 #cross validation
-#crossV <- trainControl(method = 'repeatedcv', repeats = 2)
+crossV <- trainControl(method = 'repeatedcv', repeats = 2)
 
 #set seed
 set.seed(123)
@@ -474,8 +474,7 @@ LR_latitude_b0_7 <- train(LATITUDE ~ .,
 
 # metricas
 # RMSE      Rsquared   MAE     
-# 18.33757  0.9216367  13.53414
-
+# 18.13625  0.9230477  13.49017
 
 #prediction
 LR_latitude_b0_predic7 <- predict(LR_latitude_b0_7, testing7)
@@ -485,48 +484,73 @@ postResample(testing7$LATITUDE, LR_latitude_b0_predic7)
 
 # metricas
 # RMSE   Rsquared        MAE 
-# 18.1540399  0.9234456 13.5656230  
+# 17.8792059  0.9269793 13.2333815 
 
 ###
-#depois do zerovariance again
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+predic_val1 <- predict(LR_latitude_b0_7, wifi_validation4) 
+
+#comparando 
+postResample(wifi_validation4$LATITUDE, predic_val1)
+
+# metricas
+# RMSE   Rsquared        MAE 
+# 37.6587196  0.7651451 25.5448915 
+
+###Modelo para building
+
+#transformar building em factor
+wifi_data11$BUILDINGID <-  as.factor(wifi_data11$BUILDINGID)
+
+#set seed
+set.seed(123)
 
 #separar o dado em train e test
-inTrain8 <- createDataPartition(y = wifi_data12$LATITUDE, p = .75, list = FALSE) 
+inTrain8 <- createDataPartition(y = wifi_data11$BUILDINGID, p = .75, list = FALSE) 
 
 #criar o train e o set
-training8 <- wifi_data12[ inTrain8,]
-testing8 <- wifi_data12[-inTrain8,]
+training8 <- wifi_data11[ inTrain8,]
+testing8 <- wifi_data11[-inTrain8,]
 
 #cross validation
-#crossV <- trainControl(method = 'repeatedcv', repeats = 2)
+crossV <- trainControl(method = 'repeatedcv', repeats = 2)
 
 #set seed
 set.seed(123)
 
 #treinar modelo
-LR_latitude_b0_8 <- train(LATITUDE ~ .,
-                          data = training8 %>% 
-                            select(starts_with("WAP"), LATITUDE),
-                          method = 'lm',
-                          preProc = c('center', 'scale'), 
-                          tuneLength = 1, 
-                          trControl = crossV)
+DT_building2 <- train(BUILDINGID ~ .,
+                     data = training8 %>% 
+                       select(starts_with("WAP"), BUILDINGID),   
+                     method = 'C5.0', 
+                     preProc = c('center','scale'), 
+                     tuneLength = 1, 
+                     trControl = crossV)
 
-# metricas
-# RMSE      Rsquared   MAE     
-# 18.23757  0.9225073  13.51944
+# métricas
+# model  winnow  Accuracy   Kappa    
+# rules  FALSE   0.9697387  0.9587079
+# rules   TRUE   0.9937361  0.9899641
+# tree   FALSE   0.9691516  0.9575598
+# tree    TRUE   0.9929040  0.9886310
 
-
-#prediction
-LR_latitude_b0_predic8 <- predict(LR_latitude_b0_8, testing8)
+#fazer prediction
+DT_building_predic2 <- predict(DT_building2, testing8)
 
 #postResample
-postResample(testing8$LATITUDE, LR_latitude_b0_predic8)
+postResample(testing8$BUILDINGID, DT_building_predic2)
 
-# metricas
-# RMSE   Rsquared        MAE 
-# 18.7435812  0.9185473 13.8590876  
+# métricas
+# Accuracy     Kappa 
+# 0.9938326 0.9901233 
 
 ###
 #aplicar meu modelo na validation e comparar com o resultado que já tem
-predic_val1 <- predict(LR_latitude_b0_8, wifi_validation3) 
+predic_val2 <- predict(DT_building2, wifi_validation4) 
+
+#comparando 
+postResample(wifi_validation4$BUILDINGID, predic_val2)
+
+# metricas
+# Accuracy     Kappa 
+# 0.9864986 0.9786786 
