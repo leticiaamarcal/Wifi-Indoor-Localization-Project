@@ -15,6 +15,7 @@ library(FactoMineR)
 library(factoextra)
 library(FactoMineR)
 library(corrplot)
+library(scales)
 
 #Zero Variance ----
 wifi_var0 <- nearZeroVar(wifi_data, saveMetrics = TRUE)
@@ -162,4 +163,56 @@ wifi_validation4 <- cbind(wifi_validation_waps, wifi_validation_others)
 
 #tirar coluna repetida
 wifi_data11 <- wifi_data10[, -312]
+
+#Escale rows----
+
+#primeiro vou deixar so os waps
+wifi_data11 %>% select(starts_with("WAP")) -> waps_temp
+wifi_data11 %>% select(-starts_with("WAP")) -> other_temp
+
+#aplicar o scale
+waps_rescale <- as.data.frame(t(apply(waps_temp, 1, rescale)))
+
+#juntar as variaveis
+wifi_data12 <- cbind(waps_rescale, other_temp)
+
+#Escale rows V----
+
+#primeiro vou deixar so os waps
+wifi_validation4 %>% select(starts_with("WAP")) -> waps_temp_va
+wifi_validation4 %>% select(-starts_with("WAP")) -> other_temp_va
+
+#aplicar o scale
+waps_rescale_va <- as.data.frame(t(apply(waps_temp_va, 1, rescale)))
+
+#juntar as variaveis
+wifi_validation5 <- cbind(waps_rescale_va, other_temp_va)
+
+#Building transformation ----
+
+#eu quero checar a accuracy de 100% no building. Por isso vou fazer um dataset 
+#especifico para ele. transformar todos os valores menores de -95 em -105, pois
+#estao fazendo ruido. vou fazer a transformacao antes do rescale e depois rescale 
+#again só nesse dataset pto building. o que é barulho em um, pode nao ser em outro
+
+waps_temp2 <- waps_temp
+
+waps_temp2[waps_temp2 < -94] <- -105
+
+#agora vou rescale
+waps_rescaleBU <- as.data.frame(t(apply(waps_temp2, 1, rescale)))
+
+#Juntar as variaveis
+wifi_building <- cbind(waps_rescaleBU, other_temp)
+
+#Sinal mais forte B ----
+#vou recriar coluna de sinal mais forte
+
+#criar coluna com o wap mais forte de cada linha
+wifi_building$StrongestWap2 <- colnames(wifi_building %>% select(starts_with("WAP")))[apply(wifi_building %>% select(starts_with("WAP")), 1,which.max)]
+
+#criar coluna com o valor do wap mais forte
+wifi_building$sw_sign2 <- apply(wifi_building %>% select(starts_with("WAP")), 1, max)
+
+
 

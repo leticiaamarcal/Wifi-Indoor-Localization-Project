@@ -56,5 +56,16 @@ wifi_data6 %>% ggplot(aes(x= LONGITUDE, y= LATITUDE, color = StrongestWap)) +
   geom_jitter() +
   theme(legend.position="right")
 
-                      
+###
+#Erro Building----
+
+#criar coluna no validation com a subritacao do resultado pela prediction
+wifi_validation5$errorBU <- abs(as.numeric(as.factor(wifi_validation5$BUILDINGID)) - as.numeric(predic_val_knn_b2))
+
+
+ggplot() +
+  geom_jitter(data = wifi_validation5, aes(x = LONGITUDE , y = LATITUDE,
+                                  color = as.factor(errorBU)))
+
+
 
