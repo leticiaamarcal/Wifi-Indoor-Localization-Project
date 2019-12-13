@@ -113,3 +113,7 @@ wifi_data3 %>% filter(PHONEID == 7) -> data_phone7
 #comparacao entre wifi_data7 e wifi_validation3
 #comparedf(wifi_data7, wifi_validation3)
 #Shared: 320 non-by variables and 1111 observations
+
+
+# mlknn (checar como usar)
+wifi_data13 <- mlknn(wifi_data12, k = 10, s = 1, distance = "euclidean")

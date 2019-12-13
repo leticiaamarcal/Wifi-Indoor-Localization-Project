@@ -68,4 +68,18 @@ ggplot() +
                                   color = as.factor(errorBU)))
 
 
+#prediction 3
+wifi_validation5$errorBU <- abs(as.numeric(as.factor(wifi_validation5$BUILDINGID)) - as.numeric(predic_val_knn_b3))
 
+
+ggplot() +
+  geom_jitter(data = wifi_validation5, aes(x = LONGITUDE , y = LATITUDE,
+                                           color = as.factor(errorBU)))
+
+#prediction 4
+wifi_validation5$errorBU <- abs(as.numeric(as.factor(wifi_validation5$BUILDINGID)) - as.numeric(predic_val_knn_b4))
+
+
+ggplot() +
+  geom_jitter(data = wifi_validation5, aes(x = LONGITUDE , y = LATITUDE,
+                                           color = as.factor(errorBU)))

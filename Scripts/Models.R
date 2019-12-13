@@ -6,6 +6,9 @@
 
 source("Scripts/Preprocess.R")
 
+#libraries
+library(utiml)
+library(randomForest)
 
 #Fazer 4 modelos- cada um para prever, respectivamente: Latitude(regression), 
 #Longitude(reg), Floor(classification), Building(classif)
@@ -942,7 +945,7 @@ testing15 <- wifi_building[-inTrain15,]
 set.seed(123)
 
 #treinar modelo
-knn_building3 <- train(BUILDINGID ~ .,
+knn_building3 <- train(factor(BUILDINGID) ~ .,
                        data = training15 %>% 
                          select(starts_with("WAP"), BUILDINGID),   
                        method = 'kknn', 
@@ -983,46 +986,34 @@ postResample(wifi_validation5$BUILDINGID, predic_val_knn_b3)
 # 1   0 306   1
 # 2   0   0 268
 
-
-###Treinar building, todo dataset, knn. depois trocar os menores de -95 e rescale
-#agora vou treinar com diferentes variaveis
-
-#separar o dado em train e test
-inTrain15 <- createDataPartition(y = wifi_building$BUILDINGID, p = .75, list = FALSE) 
-
-#criar o train e o set
-training15 <- wifi_building[ inTrain15,]
-testing15 <- wifi_building[-inTrain15,]
+###
+#treinar building de novo, agora com SVM Radial
 
 #set seed
 set.seed(123)
 
-wifi_building$StrongestWap2 <- as.factor(wifi_building$StrongestWap2)
-
 #treinar modelo
-knn_building4 <- train(BUILDINGID ~ .,
+knn_building4 <- train(factor(BUILDINGID) ~ .,
                        data = training15 %>% 
-                         select(sw_sign2, StrongestWap2, BUILDINGID),   
-                       method = 'kknn', 
+                         select(starts_with("WAP"), BUILDINGID),   
+                       method = 'svmRadial', 
                        preProc = c('center','scale'), 
                        tuneLength = 1, 
                        trControl = crossV)
 
 # metricas
 # Accuracy   Kappa    
-# 0.9955691  0.9929133
+# 0.9959377  0.9935046
 
 #fazer prediction
 knn_building_predic4 <- predict(knn_building4, testing15)
-#Error in model.frame.default(Terms, newdata, na.action = na.action, xlev = object$xlevels) : 
-#factor StrongestWap2 has new levels WAP289
 
 #postResample
 postResample(testing15$BUILDINGID, knn_building_predic4)
 
-metricas
-Accuracy   Kappa    
-0.9975535  0.9960845
+# metricas
+# Accuracy     Kappa 
+# 0.9979442 0.9967131 
 
 ###
 #aplicar meu modelo na validation e comparar com o resultado que já tem
@@ -1031,14 +1022,181 @@ predic_val_knn_b4 <- predict(knn_building4, wifi_validation5)
 #comparando 
 postResample(wifi_validation5$BUILDINGID, predic_val_knn_b4)
 
+# metricas
+# Accuracy     Kappa 
+# 0.9981998 0.9971541 
+
+confusionMatrix(table(wifi_validation5$BUILDINGID, predic_val_knn_b4))
+
+# predic_val_knn_b2
+# 0   1   2
+# 0 536   0   0
+# 1   1 305   1
+# 2   0   0 268
+
+###Treinar building, todo dataset, knn. depois trocar os menores de -95 e rescale
+#nao chegou a 100%
+
+#separar o dado em train e test
+inTrain16 <- createDataPartition(y = wifi_data13$BUILDINGID, p = .75, list = FALSE) 
+
+#criar o train e o set
+training16 <- wifi_data13[ inTrain16,]
+testing16 <- wifi_data13[-inTrain16,]
+
+#set seed
+set.seed(123)
+
+#treinar modelo
+knn_building5 <- train(factor(BUILDINGID) ~ .,
+                       data = training16 %>% 
+                         select(starts_with("WAP"), BUILDINGID),   
+                       method = 'kknn', 
+                       preProc = c('center','scale'), 
+                       tuneLength = 1, 
+                       trControl = crossV)
+
+# metricas
+# Accuracy   Kappa   
+# 0.9995084  0.999214
+
+#fazer prediction
+knn_building_predic5 <- predict(knn_building5, testing16)
+
+#postResample
+postResample(testing16$BUILDINGID, knn_building_predic5)
+
+# metricas
+# Accuracy    Kappa 
+# 1            1 
+
+###
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+predic_val_knn_b5 <- predict(knn_building5, wifi_validation6) 
+
+#comparando 
+postResample(wifi_validation6$BUILDINGID, predic_val_knn_b5)
+
+# metricas
+# Accuracy     Kappa 
+# 0.9882988 0.9815475 
+
+# confusionMatrix(table(wifi_validation5$BUILDINGID, predic_val_knn_b5))
+# 
+# predic_val_knn_b5
+# 0   1   2
+# 0 527   6   3
+# 1   1 304   2
+# 2   1   0 267
+
+
+###Treinar building, todo dataset, knn. depois trocar os menores de -95 e rescale
+#com o val tambem
+
+#separar o dado em train e test
+inTrain18 <- createDataPartition(y = wifi_building$BUILDINGID, p = .75, list = FALSE) 
+
+#criar o train e o set
+training18 <- wifi_building[ inTrain18,]
+testing18 <- wifi_building[-inTrain18,]
+
+#set seed
+set.seed(123)
+
+#treinar modelo
+knn_building6 <- train(factor(BUILDINGID) ~ .,
+                       data = training18 %>% 
+                         select(starts_with("WAP"), BUILDINGID),   
+                       method = 'kknn', 
+                       preProc = c('center','scale'), 
+                       tuneLength = 1, 
+                       trControl = crossV)
+
+# metricas
+# Accuracy   Kappa    
+# 0.9950082  0.9920272
+
+#fazer prediction
+knn_building_predic6 <- predict(knn_building6, testing18)
+
+#postResample
+postResample(testing18$BUILDINGID, knn_building_predic6)
+
+# metricas
+# Accuracy     Kappa 
+# 0.9953010 0.9924972 
+
+###
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+predic_val_knn_b6 <- predict(knn_building6, wifi_validation_building) 
+
+#comparando 
+postResample(wifi_validation_building$BUILDINGID, predic_val_knn_b6)
+
+# metricas
+# Accuracy     Kappa 
+# 0.9990999 0.9985774 
+
+# confusionMatrix(table(wifi_validation_building$BUILDINGID, predic_val_knn_b6))
+ 
+# predic_val_knn_b6
+# 0   1   2
+# 0 536   0   0
+# 1   0 306   1
+# 2   0   0 268
+
+##
+#O mesmo, mas com random forest
+
+###Treinar building, todo dataset, knn. depois trocar os menores de -95 e rescale
+#com o val tambem
+
+#set seed
+set.seed(123)
+
+#treinar modelo
+RForest_building <- train(factor(BUILDINGID) ~ .,
+                       data = training18 %>% 
+                         select(starts_with("WAP"), BUILDINGID),   
+                       method = '	rf', 
+                       preProc = c('center','scale'), 
+                       tuneLength = 1, 
+                       trControl = crossV)
+
+metricas
+Accuracy   Kappa    
+0.9950082  0.9920272
+
+#fazer prediction
+RForest_building_predic <- predict(RForest_building, testing18)
+
+#postResample
+postResample(testing18$BUILDINGID, RForest_building_predic)
+
+metricas
+Accuracy     Kappa 
+0.9953010 0.9924972 
+
+###
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+predic_val_RForest <- predict(RForest_building, wifi_validation_building) 
+
+#comparando 
+postResample(wifi_validation_building$BUILDINGID, predic_val_RForest)
+
 metricas
 Accuracy     Kappa 
 0.9990999 0.9985774 
 
-confusionMatrix(table(wifi_validation5$BUILDINGID, predic_val_knn_b4))
+confusionMatrix(table(wifi_validation_building$BUILDINGID, predic_val_RForest))
 
-predic_val_knn_b2
+predic_val_knn_b6
 0   1   2
 0 536   0   0
 1   0 306   1
 2   0   0 268
+
+
+
+#####CORRER RANDOM FOREST ACIMA. NAO TERMINEI
+
