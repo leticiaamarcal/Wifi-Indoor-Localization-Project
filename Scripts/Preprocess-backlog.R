@@ -357,3 +357,51 @@ waps_rescaleBU <- as.data.frame(t(apply(waps_temp2, 1, rescale)))
 
 #Juntar as variaveis
 wifi_building <- cbind(waps_rescaleBU, other_temp)
+
+#o mesmo pra validation
+waps_temp_va2 <- waps_temp_va
+other_temp_va2 <- other_temp_va
+
+waps_temp_va2[waps_temp_va2 < -94] <- -105
+
+waps_rescaleBU_va <- as.data.frame(t(apply(waps_temp_va2, 1, rescale)))
+
+wifi_validation_building <- cbind(waps_rescaleBU_va, other_temp_va2)
+
+#Sinal mais forte B ----
+#vou recriar coluna de sinal mais forte
+
+#criar coluna com o wap mais forte de cada linha
+wifi_building$StrongestWap2 <- colnames(wifi_building %>% select(starts_with("WAP")))[apply(wifi_building %>% select(starts_with("WAP")), 1,which.max)]
+
+#criar coluna com o valor do wap mais forte
+wifi_building$sw_sign2 <- apply(wifi_building %>% select(starts_with("WAP")), 1, max)
+
+##
+#Zero variance rows----
+
+# Separar os waps
+waps_temp3 <- waps_temp
+other_temp3 <- other_temp
+
+#fazer lista: variancia é zero? T or F
+wifi_0var_rows <- apply(waps_temp3, 1, var) != 0
+
+#eliminar as rows com variancia zero
+waps_temp4 <- waps_temp3[wifi_0var_rows,]
+other_temp4 <- other_temp3[wifi_0var_rows,]
+
+#juntar as variaveis
+wifi_data13 <- cbind(waps_temp4, other_temp4)
+
+#Zero variance rows V ----
+waps_temp_va3 <- waps_temp_va
+other_temp_va3 <- other_temp_va
+
+wifi_0var_rows_va <- apply(waps_temp_va3, 1, var) != 0
+
+waps_temp_va4 <- waps_temp_va3[wifi_0var_rows_va,]
+other_temp_va4 <- other_temp_va3[wifi_0var_rows_va,]
+
+wifi_validation6 <- cbind(waps_temp_va4, other_temp_va4)
+#nao tem nenhuma zero variance row

@@ -37,10 +37,10 @@ wifi_data2 %>%  select(
   "LONGITUDE", "LATITUDE", "FLOOR", "BUILDINGID", "SPACEID",
    "RELATIVEPOSITION", "USERID", "PHONEID", "TIMESTAMP") -> wifi_other
 
-#agora vou substitutir os 100 por 0 no dataframe dos waps
+#agora vou substitutir os 100 por -105 no dataframe dos waps
 wifi_wap[wifi_wap == 100] <- -105
 
-#agora vou juntar os waps modificados com as outras 9 variaveis
+#vou juntar os waps modificados com as outras 9 variaveis
 wifi_data3 <- cbind(wifi_wap, wifi_other)
 
 #Outliers (-30 to 0) ---- 
@@ -81,7 +81,6 @@ wifi_data4 <- wifi_data3 %>%
 
 #Eliminar os outliers----
 wifi_data5 <- anti_join(wifi_data4, outlier_data)
-
 
 #Eliminar User 6 ----
 #eliminar TODOS os User 6 e PhoneID 19 (celular nao deve estra funcionando bem)
@@ -190,11 +189,7 @@ wifi_validation5 <- cbind(waps_rescale_va, other_temp_va)
 
 #Building transformation ----
 
-#eu quero checar a accuracy de 100% no building. Por isso vou fazer um dataset 
-#especifico para ele. transformar todos os valores menores de -95 em -105, pois
-#estao fazendo ruido. vou fazer a transformacao antes do rescale e depois rescale 
-#again só nesse dataset pto building. o que é barulho em um, pode nao ser em outro
-
+#Chegar a accuracy de 100% no building. Fazer um dataset especifico para ele. 
 waps_temp2 <- waps_temp
 
 waps_temp2[waps_temp2 < -94] <- -105
@@ -209,7 +204,7 @@ wifi_building <- cbind(waps_rescaleBU, other_temp)
 waps_temp_va2 <- waps_temp_va
 other_temp_va2 <- other_temp_va
 
-waps_temp_va2[owaps_temp_va2 < -94] <- -105
+waps_temp_va2[waps_temp_va2 < -94] <- -105
 
 waps_rescaleBU_va <- as.data.frame(t(apply(waps_temp_va2, 1, rescale)))
 
@@ -225,7 +220,7 @@ wifi_building$StrongestWap2 <- colnames(wifi_building %>% select(starts_with("WA
 wifi_building$sw_sign2 <- apply(wifi_building %>% select(starts_with("WAP")), 1, max)
 
 ##
-#Zero variance rows----
+#Zero variance rows Train----
 
 # Separar os waps
 waps_temp3 <- waps_temp
@@ -241,17 +236,27 @@ other_temp4 <- other_temp3[wifi_0var_rows,]
 #juntar as variaveis
 wifi_data13 <- cbind(waps_temp4, other_temp4)
 
-#Zero variance rows V ----
-waps_temp_va3 <- waps_temp_va
-other_temp_va3 <- other_temp_va
+#Adicionar prediction V----
 
-wifi_0var_rows_va <- apply(waps_temp_va3, 1, var) != 0
+#mudar o nome da coluna do Building
+colnames(wifi_validation5)[372] <- 'Building_real'
 
-waps_temp_va4 <- waps_temp_va3[wifi_0var_rows_va,]
-other_temp_va4 <- other_temp_va3[wifi_0var_rows_va,]
+#adicionar o building predicition na validation
+wifi_validation5$BUILDINGID <- predic_val_knn_b6
 
-wifi_validation6 <- cbind(waps_temp_va4, other_temp_va4)
+#Divir set B para Floor----
 
+#vou dividr o wifi_data 13 em sets por building
+wifi_data13 %>% filter(BUILDINGID == 0) -> building0
 
+wifi_data13 %>% filter(BUILDINGID == 1) -> building1
 
+wifi_data13 %>% filter(BUILDINGID == 2) -> building2
+
+#Dividir set B Floor V----
+wifi_validation5 %>% filter(BUILDINGID == 0) -> building0_V
+
+wifi_validation5 %>% filter(BUILDINGID == 1) -> building1_V
+
+wifi_validation5 %>% filter(BUILDINGID == 2) -> building2_V
 
