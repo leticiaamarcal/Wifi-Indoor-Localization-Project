@@ -1419,10 +1419,10 @@ knn_floor_b1 <- train(FLOOR ~ .,
                       tuneLength = 2, 
                       trControl = crossV)
 
-metricas
-kmax  Accuracy   Kappa    
-5     0.9900672  0.9869015
-7     0.9894806  0.9861283
+# metricas
+# kmax  Accuracy   Kappa    
+# 5     0.9874944  0.9832354
+# 7     0.9874587  0.9831876
 
 #fazer prediction
 knn_floor_b1_predic <- predict(knn_floor_b1, testing21)
@@ -1430,9 +1430,9 @@ knn_floor_b1_predic <- predict(knn_floor_b1, testing21)
 #postResample
 postResample(testing21$FLOOR, knn_floor_b1_predic)
 
-metricas
-Accuracy    Kappa 
-0.989718 0.986439
+# metricas
+# Accuracy     Kappa 
+# 0.9871520 0.9827805 
 
 #aplicar meu modelo na validation e comparar com o resultado que já tem
 knn_floor_b1_predicVAL <- predict(knn_floor_b1, building1_V) 
@@ -1440,7 +1440,156 @@ knn_floor_b1_predicVAL <- predict(knn_floor_b1, building1_V)
 #comparando 
 postResample(building1_V$FLOOR, knn_floor_b1_predicVAL)
 
-metricas
-Accuracy     Kappa 
-0.8694869 0.8176293   
+# metricas
+# Accuracy     Kappa 
+# 0.2833876 0.0000000    
 
+###Agora Florr pro Building 1
+
+#transformar floor em factor
+building2$FLOOR <- as.factor(building2$FLOOR)
+building2_V$FLOOR <- as.factor(building2_V$FLOOR)
+
+#set seed
+set.seed(123)
+
+#separar o dado em train e test
+inTrain22 <- createDataPartition(y = building2$FLOOR, p = .75, list = FALSE) 
+
+#criar o train e o set
+training22 <- building2[ inTrain22,]
+testing22 <- building2[-inTrain22,]
+
+#set seed
+set.seed(123)
+
+#treinar modelo
+knn_floor_b2 <- train(FLOOR ~ .,
+                      data = training22 %>% 
+                        select(starts_with("WAP"), FLOOR),  
+                      method = 'kknn', 
+                      tuneLength = 2, 
+                      trControl = crossV)
+
+# metricas
+# kmax  Accuracy   Kappa    
+# 5     0.9843617  0.9794071
+# 7     0.9844585  0.9795318
+
+#fazer prediction
+knn_floor_b2_predic <- predict(knn_floor_b2, testing22)
+
+#postResample
+postResample(testing22$FLOOR, knn_floor_b2_predic)
+
+# metricas
+# Accuracy     Kappa 
+# 0.9815476 0.9756821 
+
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+knn_floor_b2_predicVAL <- predict(knn_floor_b2, building2_V ) 
+
+#comparando 
+postResample(building2_V$FLOOR, knn_floor_b2_predicVAL)
+
+# metricas
+# Accuracy      Kappa 
+# 0.08955224 0.00000000 
+
+
+###Treinar latitude, todo dataset, knn. depois do processo final
+
+#separar o dado em train e test
+inTrain23 <- createDataPartition(y = wifi_data13$LATITUDE, p = .75, list = FALSE) 
+
+#criar o train e o set
+training23 <- wifi_data13[ inTrain23,]
+testing23 <- wifi_data13[-inTrain23,]
+
+#set seed
+set.seed(123)
+
+#treinar modelo
+knn_latitude3 <- train(LATITUDE ~ .,
+                       data = training23 %>% 
+                         select(starts_with("WAP"), LATITUDE),
+                       method = 'kknn',
+                       preProc = c('center', 'scale'), 
+                       tuneLength = 1, 
+                       trControl = crossV)
+
+# metricas
+# RMSE      Rsquared   MAE    
+# 4.493541  0.9952558  1.98561
+
+#prediction
+knn_latitude_predic3 <- predict(knn_latitude3, testing23)
+
+#postResample
+postResample(testing23$LATITUDE, knn_latitude_predic3)
+
+# metricas
+# RMSE  Rsquared       MAE 
+# 3.6900665 0.9968147 1.8079879 
+
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+predic_val_lat3 <- predict(knn_latitude3, wifi_validation5) 
+
+#comparando 
+postResample(wifi_validation5$LATITUDE, predic_val_lat3)
+
+# metricas
+# RMSE  Rsquared       MAE 
+# 110.01288        NA  87.41467  
+
+
+#transformar floor em factor
+building0_$FLOOR <- as.factor(building0_$FLOOR)
+building0_V_$FLOOR <- as.factor(building0_V_$FLOOR)
+
+#set seed
+set.seed(123)
+
+#separar o dado em train e test
+inTrain26 <- createDataPartition(y = building0_$FLOOR, p = .75, list = FALSE) 
+
+#criar o train e o set
+training26 <- building0_[ inTrain26,]
+testing26 <- building0_[-inTrain26,]
+
+#set seed
+set.seed(123)
+
+#treinar modelo
+knn_floor_b0_ <- train(FLOOR ~ .,
+                      data = training26 %>% 
+                        select(starts_with("WAP"), FLOOR),  
+                      method = 'kknn', 
+                      preProc = c('center', 'scale'), 
+                      tuneLength = 2, 
+                      trControl = crossV)
+
+# metricas
+# kmax  Accuracy   Kappa    
+# 5     0.9674511  0.9564373
+# 7     0.9661533  0.9547012
+
+#fazer prediction
+knn_floor_b0_predic_ <- predict(knn_floor_b0_, testing26)
+
+#postResample
+postResample(testing26$FLOOR, knn_floor_b0_predic_)
+
+# metricas
+# Accuracy     Kappa 
+# 0.9792208 0.9721899 
+
+#aplicar meu modelo na validation e comparar com o resultado que já tem
+knn_floor_b0_predicVAL_ <- predict(knn_floor_b0_, building0_V_) 
+
+#comparando 
+postResample(building0_V_$FLOOR, knn_floor_b0_predicVAL_)
+
+# metricas
+# Accuracy     Kappa 
+# 0.5615672 0.3992235

@@ -192,7 +192,8 @@ wifi_data3$StrongestWap <- colnames(wifi_data3 %>% select(starts_with("WAP")))[a
 wifi_data3$sw_sign <- apply(wifi_data3 %>% select(starts_with("WAP")), 1, max)
 
 #criar no outlier_data também
-outlier_data$StrongestWap <- colnames(outlier_data %>% select(starts_with("WAP")))[apply(outlier_data %>% select(starts_with("WAP")), 1,which.max)]
+outlier_data$StrongestWap <- colnames(outlier_data %>%
+                                        select(starts_with("WAP")))[apply(outlier_data %>% select(starts_with("WAP")), 1,which.max)]
 
 outlier_data$sw_sign <- apply(outlier_data %>% select(starts_with("WAP")), 1, max)
 
@@ -405,3 +406,31 @@ other_temp_va4 <- other_temp_va3[wifi_0var_rows_va,]
 
 wifi_validation6 <- cbind(waps_temp_va4, other_temp_va4)
 #nao tem nenhuma zero variance row
+
+#Adicionar prediction V----
+
+#mudar o nome da coluna do Building ****
+#colnames(wifi_validation5)[372] <- 'Building_real'
+
+#adicionar o building predicition na validation
+#wifi_validation5$BUILDINGID <- predic_val_knn_b6
+
+#Divir set B para Floor----
+
+#vou dividr o wifi_data 13 em sets por building
+wifi_data13 <- wifi_data13[,-311]
+
+wifi_data13 %>% filter(BUILDINGID == 0) -> building0
+
+wifi_data13 %>% filter(BUILDINGID == 1) -> building1
+
+wifi_data13 %>% filter(BUILDINGID == 2) -> building2
+
+#Dividir set B Floor V----
+wifi_validation5 <- wifi_validation5[,-368]
+
+wifi_validation5 %>% filter(BUILDINGID == 0) -> building0_V
+
+wifi_validation5 %>% filter(BUILDINGID == 1) -> building1_V
+
+wifi_validation5 %>% filter(BUILDINGID == 2) -> building2_V

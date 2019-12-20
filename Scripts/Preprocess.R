@@ -176,8 +176,8 @@ waps_rescale <- as.data.frame(t(apply(waps_temp, 1, rescale)))
 wifi_data12 <- cbind(waps_rescale, other_temp)
 
 #Escale rows V----
+wifi_validation4 <- wifi_validation4[, -1] #eliminar ID
 
-#primeiro vou deixar so os waps
 wifi_validation4 %>% select(starts_with("WAP")) -> waps_temp_va
 wifi_validation4 %>% select(-starts_with("WAP")) -> other_temp_va
 
@@ -238,15 +238,17 @@ wifi_data13 <- cbind(waps_temp4, other_temp4)
 
 #Adicionar prediction V----
 
-#mudar o nome da coluna do Building
-colnames(wifi_validation5)[372] <- 'Building_real'
+#mudar o nome da coluna do Building ****
+#colnames(wifi_validation5)[372] <- 'Building_real'
 
 #adicionar o building predicition na validation
-wifi_validation5$BUILDINGID <- predic_val_knn_b6
+#wifi_validation5$BUILDINGID <- predic_val_knn_b6
 
 #Divir set B para Floor----
 
 #vou dividr o wifi_data 13 em sets por building
+wifi_data13 <- wifi_data13[,-311]
+
 wifi_data13 %>% filter(BUILDINGID == 0) -> building0
 
 wifi_data13 %>% filter(BUILDINGID == 1) -> building1
@@ -254,6 +256,8 @@ wifi_data13 %>% filter(BUILDINGID == 1) -> building1
 wifi_data13 %>% filter(BUILDINGID == 2) -> building2
 
 #Dividir set B Floor V----
+wifi_validation5 <- wifi_validation5[,-368]
+
 wifi_validation5 %>% filter(BUILDINGID == 0) -> building0_V
 
 wifi_validation5 %>% filter(BUILDINGID == 1) -> building1_V
