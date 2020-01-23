@@ -1,12 +1,9 @@
 ##--
 #Goal: Preprocess
-#Description: Clean the data
+#Description: Zero variance, Change 100 for -105, eliminate outliers, eliminate duplicates,
+#Escale roes, Column Strongest WAP
 #Developer: Letícia Marçal
 ##--
-
-#Data ---- 
-wifi_data <- read.csv("Data/trainingData.csv", sep = ",")
-wifi_validation <- read.csv("Data/validationData.csv", sep = ",")
 
 #Libraries ---- 
 library(caret)
@@ -16,6 +13,10 @@ library(factoextra)
 library(FactoMineR)
 library(corrplot)
 library(scales)
+
+#Data ---- 
+wifi_data <- read.csv("Data/trainingData.csv", sep = ",")
+wifi_validation <- read.csv("Data/validationData.csv", sep = ",")
 
 #Zero Variance ----
 wifi_var0 <- nearZeroVar(wifi_data, saveMetrics = TRUE)
