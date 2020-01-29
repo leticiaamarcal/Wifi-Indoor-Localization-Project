@@ -1,7 +1,7 @@
 ##--
 #Goal: Preprocess
 #Description: Zero variance, Change 100 for -105, eliminate outliers, eliminate duplicates,
-#Escale roes, Column Strongest WAP
+#Escale rows, Column Strongest WAP
 #Developer: Letícia Marçal
 ##--
 
